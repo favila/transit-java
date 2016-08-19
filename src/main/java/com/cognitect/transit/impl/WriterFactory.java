@@ -71,35 +71,37 @@ public class WriterFactory {
         if (customHandlers instanceof WriteHandlerMap)
             return (WriteHandlerMap) customHandlers;
 
-        if (newHandlerCache.containsKey(customHandlers)) {
-            return newHandlerCache.get(customHandlers);
-        }
-
-        synchronized (WriterFactory.class) {
-            if (newHandlerCache.containsKey(customHandlers)) {
-                return newHandlerCache.get(customHandlers);
+        final WriteHandlerMap found = newHandlerCache.get(customHandlers);
+        if (found != null)
+            return found;
+        
+        synchronized (newHandlerCache) {
+            final WriteHandlerMap found2 = newHandlerCache.get(customHandlers);
+            if (found2 != null) {
+                return found2;
             } else {
-                WriteHandlerMap writeHandlerMap = new WriteHandlerMap(customHandlers);
+                final WriteHandlerMap writeHandlerMap = new WriteHandlerMap(customHandlers);
                 newHandlerCache.put(customHandlers, writeHandlerMap);
                 return writeHandlerMap;
             }
         }
     }
-
+    
     private static WriteHandlerMap verboseHandlerMap(Map<Class, WriteHandler<?, ?>> customHandlers) {
         if (customHandlers instanceof WriteHandlerMap) {
             return ((WriteHandlerMap) customHandlers).verboseWriteHandlerMap();
         }
 
-        if (newVerboseHandlerCache.containsKey(customHandlers)) {
-            return newVerboseHandlerCache.get(customHandlers);
-        }
-
-        synchronized (WriterFactory.class) {
-            if (newVerboseHandlerCache.containsKey(customHandlers)) {
-                return newVerboseHandlerCache.get(customHandlers);
+        final WriteHandlerMap found = newVerboseHandlerCache.get(customHandlers);
+        if (found != null)
+            return found;
+        
+        synchronized (newVerboseHandlerCache) {
+            final WriteHandlerMap found2 = newVerboseHandlerCache.get(customHandlers);
+            if (found2 != null) {
+                return found2;
             } else {
-                WriteHandlerMap verboseHandlerMap = handlerMap(customHandlers).verboseWriteHandlerMap();
+                final WriteHandlerMap verboseHandlerMap = handlerMap(customHandlers).verboseWriteHandlerMap();
                 newVerboseHandlerCache.put(customHandlers, verboseHandlerMap);
                 return verboseHandlerMap;
             }
